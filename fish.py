@@ -1,7 +1,6 @@
 import pygame as pg
 from graphics import *
 from assets import *
-from settings import height, width, size
 from settings import *
 from animation import *
 from enum import Enum
@@ -27,9 +26,9 @@ class FishSprite(pg.sprite.Sprite):
         self.forward_state = FishForwardState.FORWARD_IDLE
         self.side_state = FishSideState.SIDE_IDLE
 
+        self.original_direction = (1,0)
         self.direction = (1,0)
-        self.angle = 0
-        self.move_rate = 10
+        self.move_rate = 5
         self.rotation_degree = 0.05
 
         self.left_key = controls[0]
@@ -40,16 +39,13 @@ class FishSprite(pg.sprite.Sprite):
         if self.side_state == FishSideState.MOVING_LEFT:
             new_direction = rotate(self.direction, -1 * self.rotation_degree)
             self.direction = new_direction
-            self.angle = (self.angle + 0.5) % 360
         elif self.side_state == FishSideState.MOVING_RIGHT:
             new_direction = rotate(self.direction, self.rotation_degree)
             self.direction = new_direction
-            self.angle = (self.angle - 0.5) % 360
 
     def apply_movement(self):
         self.change_direction()
         if self.forward_state == FishForwardState.FORWARD_FORWARD:
-            print(self.direction)
             newpos = self.rect.move(*tuple(self.move_rate*x for x in self.direction))
             self.rect = newpos
         newpos = clip_object(self.rect)
@@ -70,6 +66,10 @@ class FishSprite(pg.sprite.Sprite):
 
     def animate(self):
         self.image = pg.transform.scale2x(self.anim.next())
+        angle = calc_angle(self.original_direction, self.direction)
+        print("angle is " + str(angle))
+        print("direction is " + str(self.direction))
+        self.image = pg.transform.rotate(self.image, (360 - math.degrees(angle)))
 
     def update(self, dt):
         self.calculate_state()

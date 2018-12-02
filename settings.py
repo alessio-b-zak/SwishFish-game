@@ -10,6 +10,15 @@ def move_to_point(origin, destination, fps):
     stepx, stepy = (dx/fps , dy/fps )
     return stepx, stepy
 
+
+def calc_angle(vec1, vec2):
+    x1, y1, = vec1
+    x2, y2, = vec2
+    dot = x1*x2 + y1*y2      # dot product between [x1, y1] and [x2, y2]
+    det = x1*y2 - y1*x2      # determinant
+    return  math.atan2(det, dot)
+
+
 def distance(source, target):
     dist = math.sqrt((target[1]-source[1])**2 + (target[0]-source[0])**2)
     return dist
