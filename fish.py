@@ -51,27 +51,24 @@ class FishSprite(pg.sprite.Sprite):
         newpos = clip_object(self.rect)
         self.rect = newpos
 
-    def calculate_state(self):
-        keys = pg.key.get_pressed()
-        if keys[self.right_key]:
+    def get_event(self, event):
+        move_type = event.dict["movement"]
+        if move_type == ImageInsEnum.RIGHT:
             self.side_state = FishSideState.MOVING_RIGHT
-        elif keys[self.left_key]:
+        elif move_type == ImageInsEnum.LEFT:
             self.side_state = FishSideState.MOVING_LEFT
-        if not (keys[self.right_key] or keys[self.left_key]):
+        elif not (move_type == ImageInsEnum.RIGHT or move_type == ImageInsEnum.LEFT):
             self.side_state = FishSideState.SIDE_IDLE
-        if keys[self.forward_key]:
+        if move_type == ImageInsEnum.FORWARD:
             self.forward_state = FishForwardState.FORWARD_FORWARD
-        elif not keys[self.forward_key]:
+        elif move_type == ImageInsEnum.PAUSE:
             self.forward_state = FishForwardState.FORWARD_IDLE
 
     def animate(self):
         self.image = pg.transform.scale2x(self.anim.next())
         angle = calc_angle(self.original_direction, self.direction)
-        print("angle is " + str(angle))
-        print("direction is " + str(self.direction))
         self.image = pg.transform.rotate(self.image, (360 - math.degrees(angle)))
 
     def update(self, dt):
-        self.calculate_state()
         self.apply_movement()
         self.animate()

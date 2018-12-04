@@ -1,7 +1,16 @@
 import pygame as pg
 import math
+from enum import Enum
 
 size = width, height = 1500, 1500
+
+class ImageInsEnum(Enum):
+    RIGHT = 0
+    LEFT = 1
+    PAUSE = 2
+    FORWARD = 4
+
+control_mapping = {0: ImageInsEnum.RIGHT, 1: ImageInsEnum.LEFT, 2: ImageInsEnum.PAUSE, 3: ImageInsEnum.FORWARD}
 
 data_dir = "./assets"
 

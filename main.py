@@ -4,7 +4,7 @@ import os
 from graphics import load_image
 from fish import FishSprite
 from background import *
-from settings import width, height, data_dir
+from settings import width, height, data_dir, ImageInsEnum, control_mapping
 
 class Scene():
     def __init__(self):
@@ -13,15 +13,19 @@ class Scene():
         self.sprite_groups = [self.background_sprite_group, self.fish_sprite_group]
         self.background_sprite_group.add(BackgroundSprite())
         self.fish_sprite_group.add(FishSprite((width/2, height/2), (pg.K_a, pg.K_d, pg.K_w)))
+        self.instruction_receiver = InstructionReceiver("../gestures/predict_out/")
 
     def get_event(self, event):
-        pass
+        if event.type == pg.USEREVENT:
+            if "movement" in event.dict:
+               self.fish_sprite_group.get_sprite(0).get_event(event)
 
     def update(self, screen, dt):
         for group in self.sprite_groups:
             group.update(dt)
         self.calculate_collisions()
         self.draw(screen)
+        self.instruction_receiver.update()
 
     def calculate_collisions(self):
         pass
@@ -29,6 +33,36 @@ class Scene():
     def draw(self, screen):
         for group in self.sprite_groups:
             group.draw(screen)
+
+
+class InstructionReceiver:
+    def __init__(self, write_dir):
+        self.write_dir = write_dir
+
+    def fetch_txt(self):
+        text_file = None
+        if (len(os.listdir(self.write_dir)) > 0):
+            text_file = os.listdir(self.write_dir)[0]
+            text_file = self.write_dir + text_file
+        return text_file
+
+    def decode_txt(self, text_file):
+        with open(text_file) as instruction_file:
+            line = instruction_file.readline()
+            print(line)
+            os.remove(text_file)
+            moving_map = control_mapping[int(line)]
+            return moving_map
+
+    def raise_event(self, moving_enum):
+        move_player_event =  pg.event.Event(pg.USEREVENT, {"movement": moving_enum} )
+        pg.event.post(move_player_event)
+
+    def update(self):
+        text_file = self.fetch_txt()
+        if text_file is not None:
+            event = self.decode_txt(text_file)
+            self.raise_event(event)
 
 class TitleScene:
     def __init__(self):
@@ -39,7 +73,6 @@ class TitleScene:
             print("here")
             start_game_event = pg.event.Event(pg.USEREVENT, {"start_game": True})
             pg.event.post(start_game_event)
-
 
     def update(self, screen, dt):
         self.draw(screen)
@@ -64,7 +97,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.done = True
             #To allow title screen
-            elif event.type == pg.USEREVENT and not self.title:
+            elif event.type == pg.USEREVENT and not self.title and ("start_game" in event.dict):
                 self.title = True
                 self.state = Scene()
     def main_game_loop(self):
