@@ -10,7 +10,7 @@ class ImageInsEnum(Enum):
     PAUSE = 2
     FORWARD = 4
 
-control_mapping = {0: ImageInsEnum.RIGHT, 1: ImageInsEnum.LEFT, 2: ImageInsEnum.PAUSE, 3: ImageInsEnum.FORWARD}
+control_mapping = {"0": ImageInsEnum.RIGHT, "1": ImageInsEnum.LEFT, "2": ImageInsEnum.PAUSE, "3": ImageInsEnum.FORWARD}
 
 data_dir = "./assets"
 

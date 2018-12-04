@@ -51,7 +51,7 @@ class InstructionReceiver:
             line = instruction_file.readline()
             print(line)
             os.remove(text_file)
-            moving_map = control_mapping[int(line)]
+            moving_map = control_mapping[line]
             return moving_map
 
     def raise_event(self, moving_enum):
