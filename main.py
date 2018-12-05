@@ -13,7 +13,7 @@ class Scene():
         self.sprite_groups = [self.background_sprite_group, self.fish_sprite_group]
         self.background_sprite_group.add(BackgroundSprite())
         self.fish_sprite_group.add(FishSprite((width/2, height/2), (pg.K_a, pg.K_d, pg.K_w)))
-        self.instruction_receiver = InstructionReceiver("../gestures/predict_out/")
+        self.instruction_receiver = InstructionReceiver("../controls/predict_out/")
 
     def get_event(self, event):
         if event.type == pg.USEREVENT:
@@ -49,7 +49,6 @@ class InstructionReceiver:
     def decode_txt(self, text_file):
         with open(text_file) as instruction_file:
             line = instruction_file.readline()
-            print(line)
             os.remove(text_file)
             moving_map = control_mapping[line]
             return moving_map

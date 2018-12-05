@@ -19,7 +19,7 @@ class FishSprite(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self) #call Sprite initializer
         asset = data_dir + "/" + "slug_walk_right_small.png"
         self.anim = SpriteStripAnim(asset, (0,0,73,73), 4, -1, True, 12)
-        self.image = pg.transform.scale2x(self.anim.next())
+        self.image = self.anim.next()
         self.rect = self.image.get_rect()
         self.rect.center = initial_position
 
@@ -28,8 +28,8 @@ class FishSprite(pg.sprite.Sprite):
 
         self.original_direction = (1,0)
         self.direction = (1,0)
-        self.move_rate = 5
-        self.rotation_degree = 0.05
+        self.move_rate = 1.5
+        self.rotation_degree = 0.01
 
         self.left_key = controls[0]
         self.right_key = controls[1]
@@ -46,13 +46,17 @@ class FishSprite(pg.sprite.Sprite):
     def apply_movement(self):
         self.change_direction()
         if self.forward_state == FishForwardState.FORWARD_FORWARD:
+            print("here")
             newpos = self.rect.move(*tuple(self.move_rate*x for x in self.direction))
             self.rect = newpos
+        else:
+            print("self foward state " + str(self.forward_state))
         newpos = clip_object(self.rect)
         self.rect = newpos
 
     def get_event(self, event):
         move_type = event.dict["movement"]
+        print(move_type)
         if move_type == ImageInsEnum.RIGHT:
             self.side_state = FishSideState.MOVING_RIGHT
         elif move_type == ImageInsEnum.LEFT:
@@ -65,7 +69,7 @@ class FishSprite(pg.sprite.Sprite):
             self.forward_state = FishForwardState.FORWARD_IDLE
 
     def animate(self):
-        self.image = pg.transform.scale2x(self.anim.next())
+        self.image = self.anim.next()
         angle = calc_angle(self.original_direction, self.direction)
         self.image = pg.transform.rotate(self.image, (360 - math.degrees(angle)))
 
