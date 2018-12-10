@@ -7,13 +7,14 @@ from background import *
 from settings import width, height, data_dir, ImageInsEnum, control_mapping
 
 class Scene():
-    def __init__(self):
+    def __init__(self, players):
         self.background_sprite_group = pg.sprite.LayeredUpdates()
         self.fish_sprite_group = pg.sprite.LayeredUpdates()
         self.sprite_groups = [self.background_sprite_group, self.fish_sprite_group]
         self.background_sprite_group.add(BackgroundSprite())
-        self.fish_sprite_group.add(FishSprite((width/2, height/2), (pg.K_a, pg.K_d, pg.K_w)))
-        self.instruction_receiver = InstructionReceiver("../gestures/predict_out/")
+        for i in range(players):
+            self.fish_sprite_group.add(FishSprite((width/2 + (10*i), height/2), i))
+            self.instruction_receiver = InstructionReceiver("../gestures/predict_out", 0)
 
     def get_event(self, event):
         if event.type == pg.USEREVENT:
@@ -34,10 +35,11 @@ class Scene():
         for group in self.sprite_groups:
             group.draw(screen)
 
-
 class InstructionReceiver:
-    def __init__(self, write_dir):
-        self.write_dir = write_dir
+    def __init__(self, write_dir, insid):
+        self.write_dir = write_dir + str(insid) + "/"
+        if not os.path.isdir(self.write_dir):
+            os.mkdir(self.write_dir)
 
     def fetch_txt(self):
         text_file = None
@@ -99,7 +101,7 @@ class Game:
             #To allow title screen
             elif event.type == pg.USEREVENT and not self.title and ("start_game" in event.dict):
                 self.title = True
-                self.state = Scene()
+                self.state = Scene(3)
     def main_game_loop(self):
         while not self.done:
             delta_time = self.clock.tick(self.fps)/1000.0

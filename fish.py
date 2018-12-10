@@ -15,13 +15,14 @@ class FishSideState(Enum):
     SIDE_IDLE = 4
 
 class FishSprite(pg.sprite.Sprite):
-    def __init__(self, initial_position, controls):
+    def __init__(self, initial_position, fishid):
         pg.sprite.Sprite.__init__(self) #call Sprite initializer
         asset = data_dir + "/" + "slug_walk_right_small.png"
         self.anim = SpriteStripAnim(asset, (0,0,73,73), 4, -1, True, 12)
         self.image = pg.transform.scale2x(self.anim.next())
         self.rect = self.image.get_rect()
         self.rect.center = initial_position
+        self.id = fishid
 
         self.forward_state = FishForwardState.FORWARD_IDLE
         self.side_state = FishSideState.SIDE_IDLE
@@ -30,10 +31,6 @@ class FishSprite(pg.sprite.Sprite):
         self.direction = (1,0)
         self.move_rate = 5
         self.rotation_degree = 0.05
-
-        self.left_key = controls[0]
-        self.right_key = controls[1]
-        self.forward_key = controls[2]
 
     def change_direction(self):
         if self.side_state == FishSideState.MOVING_LEFT:
