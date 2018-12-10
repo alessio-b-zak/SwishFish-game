@@ -51,7 +51,6 @@ class InstructionReceiver:
     def decode_txt(self, text_file):
         with open(text_file) as instruction_file:
             line = instruction_file.readline()
-            print(line)
             os.remove(text_file)
             moving_map = control_mapping[line]
             return moving_map
