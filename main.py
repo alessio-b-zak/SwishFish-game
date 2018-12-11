@@ -19,7 +19,7 @@ class Scene():
     def get_event(self, event):
         if event.type == pg.USEREVENT:
             if "movement" in event.dict:
-               self.fish_sprite_group.get_sprite(0).get_event(event)
+                self.fish_sprite_group.get_sprite(event.dict["id"]).get_event(event)
 
     def update(self, screen, dt):
         for group in self.sprite_groups:
@@ -37,6 +37,7 @@ class Scene():
 
 class InstructionReceiver:
     def __init__(self, write_dir, insid):
+        self.id = insid
         self.write_dir = write_dir + str(insid) + "/"
         if not os.path.isdir(self.write_dir):
             os.mkdir(self.write_dir)
@@ -56,7 +57,7 @@ class InstructionReceiver:
             return moving_map
 
     def raise_event(self, moving_enum):
-        move_player_event =  pg.event.Event(pg.USEREVENT, {"movement": moving_enum} )
+        move_player_event =  pg.event.Event(pg.USEREVENT, {"movement": moving_enum, "id": self.id} )
         pg.event.post(move_player_event)
 
     def update(self):
