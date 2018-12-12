@@ -12,21 +12,23 @@ class Scene():
         self.fish_sprite_group = pg.sprite.LayeredUpdates()
         self.sprite_groups = [self.background_sprite_group, self.fish_sprite_group]
         self.background_sprite_group.add(BackgroundSprite())
-        for i in range(players):
+        self.instruction_receivers = []
+        for i in range(1,players+1):
             self.fish_sprite_group.add(FishSprite((width/2 + (10*i), height/2), i))
-            self.instruction_receiver = InstructionReceiver("../gestures/predict_out", 0)
+            self.instruction_receivers.append(InstructionReceiver("../controls/predict_out/player_", i))
 
     def get_event(self, event):
         if event.type == pg.USEREVENT:
             if "movement" in event.dict:
-                self.fish_sprite_group.get_sprite(event.dict["id"]).get_event(event)
+                self.fish_sprite_group.get_sprite(event.dict["id"]-1).get_event(event)
 
     def update(self, screen, dt):
         for group in self.sprite_groups:
             group.update(dt)
         self.calculate_collisions()
         self.draw(screen)
-        self.instruction_receiver.update()
+        for instruction_receiver in self.instruction_receivers:
+            instruction_receiver.update()
 
     def calculate_collisions(self):
         pass
@@ -53,8 +55,11 @@ class InstructionReceiver:
         with open(text_file) as instruction_file:
             line = instruction_file.readline()
             os.remove(text_file)
-            moving_map = control_mapping[line]
-            return moving_map
+            try:
+                moving_map = control_mapping[line]
+                return moving_map
+            except:
+                pass
 
     def raise_event(self, moving_enum):
         move_player_event =  pg.event.Event(pg.USEREVENT, {"movement": moving_enum, "id": self.id} )

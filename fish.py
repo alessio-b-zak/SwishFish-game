@@ -17,7 +17,7 @@ class FishSideState(Enum):
 class FishSprite(pg.sprite.Sprite):
     def __init__(self, initial_position, fishid):
         pg.sprite.Sprite.__init__(self) #call Sprite initializer
-        asset = data_dir + "/" + "slug_walk_right_small.png"
+        asset = data_dir + "/" + "fish_swim_" + str(fishid) + ".png"
         self.anim = SpriteStripAnim(asset, (0,0,73,73), 4, -1, True, 12)
         self.image = self.anim.next()
         self.rect = self.image.get_rect()
@@ -43,16 +43,16 @@ class FishSprite(pg.sprite.Sprite):
     def apply_movement(self):
         self.change_direction()
         if self.forward_state == FishForwardState.FORWARD_FORWARD:
-            print("here")
             newpos = self.rect.move(*tuple(self.move_rate*x for x in self.direction))
             self.rect = newpos
         else:
-            print("self foward state " + str(self.forward_state))
+            pass
         newpos = clip_object(self.rect)
         self.rect = newpos
 
     def get_event(self, event):
         move_type = event.dict["movement"]
+        print("fish " + str(self.id) + " is " + str(move_type))
         print(move_type)
         if move_type == ImageInsEnum.RIGHT:
             self.side_state = FishSideState.MOVING_RIGHT
