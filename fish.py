@@ -52,8 +52,6 @@ class FishSprite(pg.sprite.Sprite):
 
     def get_event(self, event):
         move_type = event.dict["movement"]
-        print("fish " + str(self.id) + " is " + str(move_type))
-        print(move_type)
         if move_type == ImageInsEnum.RIGHT:
             self.side_state = FishSideState.MOVING_RIGHT
         elif move_type == ImageInsEnum.LEFT:
