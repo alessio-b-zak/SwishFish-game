@@ -2,7 +2,7 @@ import pygame as pg
 import math
 from enum import Enum
 
-size = width, height = 800, 800
+size = width, height = 1400, 1000
 
 class ImageInsEnum(Enum):
     LEFT = 0
@@ -12,7 +12,7 @@ class ImageInsEnum(Enum):
 
 control_mapping = {"0": ImageInsEnum.LEFT, "1": ImageInsEnum.FORWARD, "2": ImageInsEnum.RIGHT, "3": ImageInsEnum.PAUSE}
 
-data_dir = "./assets"
+data_dir = "./game/assets"
 
 def move_to_point(origin, destination, fps):
     dx, dy = (destination[0] - origin[0], destination[1] - origin[1])

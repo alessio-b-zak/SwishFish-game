@@ -10,16 +10,13 @@ class BackgroundSprite(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self) #call Sprite initializer
 
-        asset = data_dir + "/" + "background_animation.png"
-        self.anim = SpriteStripAnim(asset, (0,0, 500,500), 20, loop=True, frames=9)
-        self.image = pg.transform.scale(self.anim.next(), (height, width))
+        asset = data_dir + "/" + "fish_background.png"
+        self.image = pg.transform.scale(pg.image.load(asset), size)
         self.rect = self.image.get_rect()
         # self.rect = (0,0)
 
     def animate(self):
-        self.image = pg.transform.scale(self.anim.next(), (height, width))
-
+        pass
 
     def update(self, dt):
-        self.animate()
-
+        pass

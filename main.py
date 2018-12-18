@@ -1,6 +1,8 @@
 import pygame as pg
 import sys
 import os
+import time
+import select
 from graphics import load_image
 from fish import FishSprite
 from background import *
@@ -13,9 +15,10 @@ class Scene():
         self.sprite_groups = [self.background_sprite_group, self.fish_sprite_group]
         self.background_sprite_group.add(BackgroundSprite())
         self.instruction_receivers = []
+        self.read_input = 0
         for i in range(1,players+1):
             self.fish_sprite_group.add(FishSprite((width/2 + (10*i), height/2), i))
-            self.instruction_receivers.append(InstructionReceiver("../controls/predict_out/player_", i))
+            self.instruction_receivers.append(InstructionReceiver("pipe_", i))
 
     def get_event(self, event):
         if event.type == pg.USEREVENT:
@@ -25,10 +28,12 @@ class Scene():
     def update(self, screen, dt):
         for group in self.sprite_groups:
             group.update(dt)
-        self.calculate_collisions()
         self.draw(screen)
+        # print("Reading input")
+        self.read_input = 0
         for instruction_receiver in self.instruction_receivers:
             instruction_receiver.update()
+        self.read_input += dt
 
     def calculate_collisions(self):
         pass
@@ -38,35 +43,38 @@ class Scene():
             group.draw(screen)
 
 class InstructionReceiver:
-    def __init__(self, write_dir, insid):
+    def __init__(self, pipe_name, insid):
         self.id = insid
-        self.write_dir = write_dir + str(insid) + "/"
-        if not os.path.isdir(self.write_dir):
-            os.mkdir(self.write_dir)
+        # self.write_dir = write_dir + str(insid) + "/"
+        # if not os.path.isdir(self.write_dir):
+        #     os.mkdir(self.write_dir)
 
-    def fetch_txt(self):
-        text_file = None
-        if (len(os.listdir(self.write_dir)) > 0):
-            text_file = os.listdir(self.write_dir)[0]
-            text_file = self.write_dir + text_file
-        return text_file
+        if not os.path.exists(pipe_name + str(insid)):
+            os.mkfifo(pipe_name + str(insid))
+        self.pipein = open(pipe_name + str(insid), 'r')
 
-    def decode_txt(self, text_file):
-        with open(text_file) as instruction_file:
-            line = instruction_file.readline()
-            os.remove(text_file)
-            try:
-                moving_map = control_mapping[line]
-                return moving_map
-            except:
-                pass
+    def fetch_code(self):
+        r, w, e = select.select([ self.pipein ], [], [], 0)
+        if self.pipein in r:
+            return self.pipein.readline()[:-1]
+        else:
+             return None
+
+    def decode_txt(self, line):
+        try:
+            moving_map = control_mapping[line]
+            # print("found input ")
+            return moving_map
+        except:
+            pass
 
     def raise_event(self, moving_enum):
         move_player_event =  pg.event.Event(pg.USEREVENT, {"movement": moving_enum, "id": self.id} )
         pg.event.post(move_player_event)
 
     def update(self):
-        text_file = self.fetch_txt()
+        # print("updating")
+        text_file = self.fetch_code()
         if text_file is not None:
             event = self.decode_txt(text_file)
             self.raise_event(event)
@@ -77,7 +85,7 @@ class TitleScene:
 
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            print("here")
+            # print("here")
             start_game_event = pg.event.Event(pg.USEREVENT, {"start_game": True})
             pg.event.post(start_game_event)
 
@@ -113,6 +121,7 @@ class Game:
             self.event_loop()
             self.update(delta_time)
             pg.display.update()
+
 
 if __name__ == '__main__':
     pg.init()
