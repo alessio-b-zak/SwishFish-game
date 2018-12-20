@@ -3,6 +3,7 @@ import math
 from enum import Enum
 
 size = width, height = 1400, 1000
+num_players = 3
 
 class ImageInsEnum(Enum):
     LEFT = 0

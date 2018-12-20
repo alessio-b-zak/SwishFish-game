@@ -6,7 +6,7 @@ import select
 from graphics import load_image
 from fish import FishSprite
 from background import *
-from settings import width, height, data_dir, ImageInsEnum, control_mapping
+from settings import width, height, data_dir, ImageInsEnum, control_mapping, num_players
 
 class Scene():
     def __init__(self, players):
@@ -114,7 +114,7 @@ class Game:
             #To allow title screen
             elif event.type == pg.USEREVENT and not self.title and ("start_game" in event.dict):
                 self.title = True
-                self.state = Scene(3)
+                self.state = Scene(num_players)
     def main_game_loop(self):
         while not self.done:
             delta_time = self.clock.tick(self.fps)/1000.0
